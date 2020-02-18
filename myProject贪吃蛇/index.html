@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../../2.15周末作业/小游戏/js/canvas.js"></script>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <button onclick="playgame(1)">开始游戏</button>
+    <button onclick="playgame(0)">暂停游戏</button>
+    <script>
+        var timer = null;
+        var size = 8;
+        var x = 8,y = 8;
+        var len = 10;
+        var a = 0,b = 0;//食物坐标
+        var code = 2;
+
+        var map = [];//记录每个矩形的位置
+        var canvas = CanvasInfo.canvas({
+            idName: 'canvas',
+            w: 400,
+            h: 400,
+            border: '1px solid #ccc'
+        });
+        function playgame(number){
+            if(number == 1){
+                timer = setInterval(setgame,100);
+                rand_frog();
+            }else{
+                clearInterval(timer);
+            }
+        }
+        function setgame(){
+            switch(code){
+                case 1:
+                    y -= size;//上
+                    break;
+                case 2:
+                    x += size;//右
+                    break;
+                case 3:
+                    y += size;//下
+                    break;
+                case 0: 
+                    x -= size;//左
+            }
+            //不能碰自己
+            for(let i=0;i<map.length;i++){
+                if(parseInt(map[i].x) == x && parseInt(map[i].y) == y){
+                    alert('碰到自己了');
+                    clearInterval(timer);
+                }
+                //判断食物是否出现在蛇身上,且如果蛇吃到食物，就重新创建食物
+                if(parseInt(map[i].x) == a && parseInt(map[i].y) == b){
+                    rand_frog();
+                }
+            }
+            if(a == x && b == y){
+                len++;
+                rand_frog();
+            }
+            if(x>400-size || x<0 || y>400-size || y<0){
+                alert('你碰到墙壁了，游戏结束');
+                clearInterval(timer);
+            }
+
+            if(map.length >= len){
+                var cl = map.shift()//删除数组第一项
+                canvas.clearRect(cl['x']-1,cl['y']-1,size+2,size+2);
+            }
+            map.push({x,y})
+            canvas.fillStyle = '#069';
+            // canvas.strokeStyle = '#069';
+            canvas.fillRect(x,y,size,size);
+            console.log(map)
+        }
+        document.onkeydown = function(ev){
+            var key = ev.keyCode - 37
+            if(code == 1 && key !=3){
+                code = key;
+            }else if(code == 2 && key != 0){
+                code = key;
+            }else if(code == 3 && key != 1){
+                code = key;
+            }else if(code == 0&& key != 2){
+                code = key;
+            }
+        }
+        //投放食物
+        function rand_frog(){
+            a = Math.ceil(Math.random()*49)*8;
+            b = Math.ceil(Math.random()*49)*8;
+            canvas.fillStyle = 'black';
+            canvas.fillRect(a,b,size,size);
+        }
+
+
+    </script>
+</body>
+</html>
